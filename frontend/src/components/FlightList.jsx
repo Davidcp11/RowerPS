@@ -1,38 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React from 'react';
+// 1. Não precisamos mais de useState, useEffect ou axios
+// (Eles foram movidos para o App.jsx)
 
-export default function FlightList({ onFlightSelect }) {
-  // 1. Criamos um estado para armazenar a lista de voos
-  const [flights, setFlights] = useState([]);
-  // 2. Criamos um estado para loading (boa prática)
-  const [loading, setLoading] = useState(true);
-  // 3. Criamos um estado para erros
-  const [error, setError] = useState(null);
+// 2. Receba as novas props: loading, error, flights
+export default function FlightList({ loading, error, flights, onFlightSelect }) {
 
-  // 4. useEffect: Roda UMA VEZ quando o componente é montado
-  useEffect(() => {
-    // 5. Função assíncrona para buscar os dados
-    const fetchFlights = async () => {
-      try {
-        // 6. Usamos o Axios para fazer o GET no nosso backend
-        const response = await axios.get('http://localhost:3000/flights');
-        
-        // 7. Atualizamos o estado com os dados recebidos
-        setFlights(response.data);
-      } catch (err) {
-        // 8. Se der erro, guardamos a mensagem de erro
-        setError('Não foi possível carregar os voos.');
-        console.error('Erro ao buscar voos:', err);
-      } finally {
-        // 9. Independentemente de sucesso ou erro, paramos o loading
-        setLoading(false);
-      }
-    };
+  // 3. A lógica de useState, useEffect e fetchFlights foi REMOVIDA
 
-    fetchFlights(); // Executa a função de busca
-  }, []); // O array vazio [] garante que isso rode só uma vez
-
-  // 10. Lógica de Renderização
+  // 4. A lógica de renderização permanece a mesma,
+  //    pois ela agora usa as props
   if (loading) {
     return <p>Carregando voos...</p>;
   }
@@ -40,6 +16,16 @@ export default function FlightList({ onFlightSelect }) {
   if (error) {
     return <p style={{ color: 'red' }}>{error}</p>;
   }
+
+  const formatDateTime = (isoString) => {
+    return new Date(isoString).toLocaleString('pt-BR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  };
 
   return (
     <div className="flight-list-container">
@@ -52,9 +38,14 @@ export default function FlightList({ onFlightSelect }) {
               <strong>{flight.mission}</strong>
               <p>Drone: {flight.droneSisant}</p>
               <p>Operador: {flight.operatorSarpas}</p>
+              <p><strong>Início:</strong> {formatDateTime(flight.startTime)}</p>
+              <p><strong>Fim:</strong> {formatDateTime(flight.endTime)}</p>
+              <span className={`flight-status ${flight.status === 'Concluído' ? 'status-completed' : 'status-scheduled'}`}>
+                {flight.status}
+              </span>
               <button 
                 className="view-button"
-                onClick={() => onFlightSelect(flight)} // Envia o voo para o App.jsx
+                onClick={() => onFlightSelect(flight)}
               >
                 Ver no Mapa
               </button>

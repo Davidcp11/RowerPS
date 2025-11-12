@@ -76,6 +76,7 @@ body {
 }
 
 .flight-item {
+  text-align: center;
   background-color: #f9f9f9;
   border: 1px solid #eee;
   border-radius: 8px;
@@ -103,6 +104,7 @@ body {
   border: none;
   border-radius: 5px;
   padding: 8px 12px;
+  margin-left: 3px;
   font-weight: bold;
   cursor: pointer;
   margin-top: 10px;
@@ -121,4 +123,180 @@ body {
   -webkit-backface-visibility: hidden;
   -moz-backface-visibility: hidden;
   backface-visibility: hidden;
+}
+
+/* 6. Estilos do FlightForm */
+.flight-form {
+  padding: 20px;
+  border-bottom: 2px solid #eee;
+  background-color: #fafafa;
+}
+
+.flight-form h3 {
+  margin-top: 0;
+  color: var(--primary-color);
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 5px;
+  color: #333;
+}
+
+.form-group input {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 1rem;
+}
+
+.form-row {
+  display: flex;
+  gap: 10px;
+}
+
+.form-row .form-group {
+  flex: 1;
+  /* Ocupa espaço igual */
+}
+
+.submit-button {
+  background-color: var(--primary-color);
+  color: white;
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 5px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.submit-button:hover {
+  background-color: var(--primary-hover);
+}
+
+.form-error {
+  color: #D8000C;
+  background-color: #FFD2D2;
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 15px;
+}
+
+.form-info {
+  color: #00529B;
+  background-color: #BDE5F8;
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 15px;
+}
+
+.form-success {
+  color: #4F8A10;
+  background-color: #DFF2BF;
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 15px;
+}
+
+.form-success-wrapper {
+  display: flex;
+  /* <-- A MÁGICA: alinha os itens lado a lado */
+  align-items: center;
+  /* <-- Alinha verticalmente */
+  justify-content: space-between;
+  /* <-- Coloca espaço entre o texto e o botão */
+
+  background-color: #DFF2BF;
+  border-radius: 5px;
+  margin-bottom: 15px;
+  /* Garante que o botão não "vaze" */
+  overflow: hidden;
+}
+
+/* * A tag <p> com a classe .form-success 
+ * (Não precisamos de regras novas aqui, apenas
+ * garantir que o seletor .form-success-wrapper p funcione)
+*/
+.form-success-wrapper p {
+  color: #4F8A10;
+  padding: 5px;
+  margin: 0;
+  flex-grow: 1;
+  /* Faz o texto ocupar o espaço disponível */
+}
+
+/* O botão "Refazer" */
+.cancel-button {
+  background-color: var(--secondary-color);
+  color: white;
+  border: none;
+  /* Arredonda só os cantos da direita */
+  border-radius: 0 5px 5px 0;
+  padding: 10px 12px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.2s ease;
+
+  /* Garante que o botão não encolha */
+  flex-shrink: 0;
+  /* Remove a borda preta do 'focus' */
+  outline: none;
+}
+
+.cancel-button:hover {
+  background-color: var(--secondary-hover);
+}
+
+.flight-status {
+  /* display: inline-block; é a chave para o badge */
+  display: inline-block;
+  padding: 5px 12px;
+  border-radius: 15px;
+  /* Mais arredondado */
+  font-size: 0.8rem;
+  font-weight: bold;
+  margin-top: 10px;
+  text-transform: uppercase;
+}
+
+/* Cor para status 'Agendado' (cor primária) */
+.status-scheduled {
+  background-color: #d1eaf0;
+  color: var(--primary-color);
+}
+
+/* Cor para status 'Concluído' (neutro) */
+.status-completed {
+  background-color: #d1f0dc; /* Um cinza mais claro */
+  color: var(--primary-color);
+}
+
+
+
+.app-header {
+  background-color: var(--primary-color);
+  color: white;
+  padding: 10px 20px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  
+  /* Adicione estas duas linhas para alinhar */
+  display: flex;
+  align-items: center;
+}
+
+/* Adicione este novo estilo */
+.header-logo {
+  height: 40px; /* Defina a altura */
+  width: 40px;  /* Defina a largura */
+  margin-right: 15px; /* Dê espaço antes do título */
 }

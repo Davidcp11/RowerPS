@@ -3,7 +3,7 @@ import React from 'react';
 // (Eles foram movidos para o App.jsx)
 
 // 2. Receba as novas props: loading, error, flights
-function FlightList({ loading, error, flights, onFlightSelect }) {
+export default function FlightList({ loading, error, flights, onFlightSelect }) {
 
   // 3. A lógica de useState, useEffect e fetchFlights foi REMOVIDA
 
@@ -41,5 +41,3 @@ function FlightList({ loading, error, flights, onFlightSelect }) {
     </div>
   );
 }
-
-export default FlightList;

@@ -16,6 +16,11 @@ function App() {
   const [selectedFlight, setSelectedFlight] = useState(null);
   const [mapInstance, setMapInstance] = useState(null);
 
+  // 1. Guarda os pontos do polígono que o usuário desenhou
+  const [newPolygonPoints, setNewPolygonPoints] = useState([]);
+  // 2. A 'key' para forçar o MapViewer a limpar o desenho
+  const [clearPolygonKey, setClearPolygonKey] = useState(Date.now());
+
   // 3. Crie a função de busca de voos aqui
   const fetchFlights = async () => {
     setLoading(true);
@@ -46,6 +51,22 @@ function App() {
     }
   };
 
+  // 3. Função que será chamada pelo MapViewer
+  const handlePolygonDrawn = (coordinates) => {
+    console.log('Polígono desenhado:', coordinates);
+    setNewPolygonPoints(coordinates);
+  };
+  
+  // 4. Função que será chamada pelo FlightForm
+  const handleFlightCreated = () => {
+    // 4a. Recarregar a lista de voos
+    fetchFlights();
+    // 4b. Limpar o polígono desenhado
+    setNewPolygonPoints([]);
+    // 4c. Forçar o MapViewer a limpar o desenho (nova key)
+    setClearPolygonKey(Date.now());
+  };
+
   return (
     <div className="app-container">
       <header className="app-header">
@@ -54,7 +75,10 @@ function App() {
 
       <main className="app-main">
         <div className="list-panel">
-          <FlightForm />
+          <FlightForm 
+            polygonPoints={newPolygonPoints}
+            onFlightCreated={handleFlightCreated}
+          />
           {/* 5. Passe os dados dos voos (loading, error, flights) para o FlightList */}
           <FlightList 
             loading={loading}
@@ -67,7 +91,9 @@ function App() {
         <div className="map-panel">
           <MapViewer 
             selectedFlight={selectedFlight}
-            onMapReady={setMapInstance} 
+            onMapReady={setMapInstance}
+            onPolygonDrawn={handlePolygonDrawn}
+            clearPolygonKey={clearPolygonKey} 
           />
         </div>
       </main>

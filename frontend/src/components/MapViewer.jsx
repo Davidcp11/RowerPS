@@ -6,21 +6,30 @@ import {
   TileLayer, 
   Marker, 
   Popup, 
-  Polygon
-  // 1. Não precisamos mais do 'useMap' nem do 'ChangeView'
+  Polygon,
+  FeatureGroup // 1. Importe o FeatureGroup
 } from 'react-leaflet';
+import { EditControl } from 'react-leaflet-draw'; // 2. Importe o EditControl
 
-// 2. Receba 'selectedFlight' e a nova 'onMapReady'
-function MapViewer({ selectedFlight, onMapReady }) {
+// 3. Receba as novas props: 'onPolygonDrawn' e 'clearPolygonKey'
+function MapViewer({ selectedFlight, onMapReady, onPolygonDrawn, clearPolygonKey }) {
   const defaultPosition = [-14.235, -51.925];
   
   let polygonCoords = null;
-
-  // 3. Lógica simples de polígono (como era antes)
   if (selectedFlight) {
     const parsedPolygon = JSON.parse(selectedFlight.polygonJson);
     polygonCoords = parsedPolygon.map(p => [p.lat, p.lng]);
   }
+
+  // 4. Função que é chamada quando o usuário TERMINA de desenhar
+  const handlePolygonCreated = (e) => {
+    const layer = e.layer;
+    // O Leaflet-Draw retorna {lat, lng}, que é o formato que nosso backend espera!
+    const coordinates = layer.getLatLngs()[0]; 
+    
+    // Envia os pontos para o App.jsx
+    onPolygonDrawn(coordinates);
+  };
 
   return (
     <MapContainer 
@@ -29,7 +38,6 @@ function MapViewer({ selectedFlight, onMapReady }) {
       style={{ height: '100%', width: '100%' }}
       zoomSnap={0.1}
       zoomDelta={0.25}
-      // 4. Use a prop 'ref' para enviar a instância do mapa para o App.jsx
       ref={onMapReady}
     >
       <TileLayer
@@ -37,7 +45,35 @@ function MapViewer({ selectedFlight, onMapReady }) {
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       />
       
-      {/* 5. Lógica de renderização simples */}
+      {/* 5. FeatureGroup é onde os desenhos vão ficar */}
+      <FeatureGroup>
+        <EditControl
+          position="topright"
+          onCreated={handlePolygonCreated}
+          draw={{
+            rectangle: false,
+            circle: false,
+            circlemarker: false,
+            marker: false,
+            polyline: false,
+            polygon: {
+              allowIntersection: false, // Impede polígonos complexos
+              shapeOptions: {
+                color: '#ECB733' // Cor Secundária ROWER
+              }
+            }
+          }}
+          edit={{
+            // Desabilitamos a edição e deleção por enquanto
+            edit: false,
+            remove: false
+          }}
+          // 6. Esta 'key' é um truque para limpar o desenho
+          key={clearPolygonKey} 
+        />
+      </FeatureGroup>
+      
+      {/* Lógica para MOSTRAR o polígono selecionado (sem alteração) */}
       {!selectedFlight ? (
         <Marker position={defaultPosition}>
           <Popup>Centro do Brasil</Popup>

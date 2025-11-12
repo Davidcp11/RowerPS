@@ -1,21 +1,31 @@
-import React, { useState } from 'react';
+// src/components/FlightForm.jsx
 
-export default function FlightForm() {
-  // 1. Criar um estado para cada campo do formulário
+import React, { useState } from 'react';
+import axios from 'axios'; 
+
+function FlightForm({ polygonPoints, onFlightCreated }) {
   const [mission, setMission] = useState('');
   const [operatorSarpas, setOperatorSarpas] = useState('');
   const [droneSisant, setDroneSisant] = useState('');
-  // Para datas e horas, o HTML5 lida bem com strings
   const [startDate, setStartDate] = useState('');
   const [startTime, setStartTime] = useState('');
   const [endDate, setEndDate] = useState('');
   const [endTime, setEndTime] = useState('');
+  
+  const [submitting, setSubmitting] = useState(false);
+  const [formError, setFormError] = useState(null);
 
-  const handleSubmit = (e) => {
-    e.preventDefault(); // Impede o recarregamento da página
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    if (polygonPoints.length === 0) {
+      setFormError('Por favor, desenhe o polígono do voo no mapa.');
+      return;
+    }
 
-    // Lógica de combinação de data/hora
-    // Ex: "2025-12-01" + "T" + "10:00" + ":00Z" -> "2025-12-01T10:00:00Z"
+    setSubmitting(true);
+    setFormError(null);
+
     const startISO = `${startDate}T${startTime}:00Z`;
     const endISO = `${endDate}T${endTime}:00Z`;
 
@@ -25,17 +35,38 @@ export default function FlightForm() {
       droneSisant,
       startTime: startISO,
       endTime: endISO,
-      // O polígono virá do mapa depois
-      polygonJson: [], 
+      polygonJson: polygonPoints, 
     };
 
-    console.log('Dados do formulário para enviar:', formData);
-    // Aqui, no futuro, chamaremos o axios.post
+    try {
+      await axios.post('http://localhost:3000/flights', formData);
+      
+      setMission('');
+      setOperatorSarpas('');
+      setDroneSisant('');
+      setStartDate('');
+      setStartTime('');
+      setEndDate('');
+      setEndTime('');
+      onFlightCreated(); 
+
+    } catch (err) {
+      if (err.response && err.response.data && err.response.data.error) {
+        setFormError(err.response.data.error);
+      } else {
+        setFormError('Erro ao cadastrar o voo. Tente novamente.');
+      }
+      console.error('Erro ao enviar formulário:', err);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
     <form className="flight-form" onSubmit={handleSubmit}>
       <h3>Cadastrar Novo Voo</h3>
+      
+      {/* --- INÍCIO DOS INPUTS QUE SUMIRAM --- */}
       
       <div className="form-group">
         <label>Missão</label>
@@ -68,7 +99,6 @@ export default function FlightForm() {
         />
       </div>
 
-      {/* Inputs de Data e Hora */}
       <div className="form-row">
         <div className="form-group">
           <label>Data Início</label>
@@ -111,9 +141,24 @@ export default function FlightForm() {
         </div>
       </div>
 
-      <button type="submit" className="submit-button">
-        Cadastrar Voo
+      {/* --- FIM DOS INPUTS QUE SUMIRAM --- */}
+      
+      {/* Mensagens de feedback */}
+      {formError && (
+        <p className="form-error">{formError}</p>
+      )}
+      {polygonPoints.length === 0 && !formError && (
+        <p className="form-info">Use o ícone de polígono no mapa para desenhar a área.</p>
+      )}
+      {polygonPoints.length > 0 && !formError && (
+        <p className="form-success">Área do polígono definida!</p>
+      )}
+
+      <button type="submit" className="submit-button" disabled={submitting}>
+        {submitting ? 'Cadastrando...' : 'Cadastrar Voo'}
       </button>
     </form>
   );
 }
+
+export default FlightForm;

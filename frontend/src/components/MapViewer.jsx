@@ -15,7 +15,7 @@ import { EditControl } from 'react-leaflet-draw'; // 2. Importe o EditControl
 function MapViewer({ selectedFlight, onMapReady, onPolygonDrawn, clearPolygonKey }) {
   const featureGroupRef = useRef();
 
-  const defaultPosition = [-14.235, -51.925];
+  const defaultPosition = [-23.203050020264428, -45.87430194541117];
   
   let polygonCoords = null;
   if (selectedFlight) {
@@ -88,7 +88,7 @@ function MapViewer({ selectedFlight, onMapReady, onPolygonDrawn, clearPolygonKey
       {/* Lógica para MOSTRAR o polígono selecionado (sem alteração) */}
       {!selectedFlight ? (
         <Marker position={defaultPosition}>
-          <Popup>Centro do Brasil</Popup>
+          <Popup>Casa do Baiano</Popup>
         </Marker>
       ) : (
         <Polygon 

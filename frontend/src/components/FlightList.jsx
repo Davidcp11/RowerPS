@@ -17,6 +17,16 @@ export default function FlightList({ loading, error, flights, onFlightSelect }) 
     return <p style={{ color: 'red' }}>{error}</p>;
   }
 
+  const formatDateTime = (isoString) => {
+    return new Date(isoString).toLocaleString('pt-BR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  };
+
   return (
     <div className="flight-list-container">
       {flights.length === 0 ? (
@@ -28,6 +38,11 @@ export default function FlightList({ loading, error, flights, onFlightSelect }) 
               <strong>{flight.mission}</strong>
               <p>Drone: {flight.droneSisant}</p>
               <p>Operador: {flight.operatorSarpas}</p>
+              <p><strong>Início:</strong> {formatDateTime(flight.startTime)}</p>
+              <p><strong>Fim:</strong> {formatDateTime(flight.endTime)}</p>
+              <span className={`flight-status ${flight.status === 'Concluído' ? 'status-completed' : 'status-scheduled'}`}>
+                {flight.status}
+              </span>
               <button 
                 className="view-button"
                 onClick={() => onFlightSelect(flight)}

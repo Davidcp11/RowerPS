@@ -86,7 +86,7 @@ app.post('/flights', async (req, res) => {
     if (!sarpasRegex.test(operatorSarpas)) {
       return res.status(400).json({ error: 'Formato de SARPAS inválido. Deve conter 3 letras e 3 números.' });
     }
-    
+
     // SISANT: PP-xxxxxxx (7 dígitos)
     const sisantRegex = /^PP-\d{7}$/;
     if (!sisantRegex.test(droneSisant)) {
@@ -94,7 +94,7 @@ app.post('/flights', async (req, res) => {
     }
 
     // --- 6. VALIDAÇÃO DE CONFLITO ESPACIAL (POLÍGONO) ---
-    
+
     // 6a. Encontrar voos simultâneos (qualquer voo que "toque" o novo período)
     const simultaneousFlights = await prisma.flight.findMany({
       where: {
@@ -112,21 +112,21 @@ app.post('/flights', async (req, res) => {
       // Nota: O Turf exige que o polígono seja "fechado"
       // (o primeiro e o último ponto devem ser iguais).
       const newPolygonCoords = [...polygonJson, polygonJson[0]]; // Fecha o polígono
-      
+
       // O formato GeoJSON que o Turf precisa é: [[ [lng, lat], [lng, lat], ... ]]
       // Nosso formato é: [ {lat, lng}, {lat, lng}, ... ]
       // Precisamos converter:
       const newTurfPolygon = turf.polygon([
-         newPolygonCoords.map(p => [p.lng, p.lat]) 
+        newPolygonCoords.map(p => [p.lng, p.lat])
       ]);
 
 
       // 6c. Iterar sobre os voos simultâneos e checar a intersecção
       for (const flight of simultaneousFlights) {
-        
+
         // Converte o polígono salvo no banco (string) de volta para JSON
         const existingPolygonJson = JSON.parse(flight.polygonJson);
-        
+
         // Fecha o polígono e converte para o formato [lng, lat]
         const existingPolygonCoords = [...existingPolygonJson, existingPolygonJson[0]];
         const existingTurfPolygon = turf.polygon([
@@ -157,7 +157,7 @@ app.post('/flights', async (req, res) => {
     });
 
     res.status(201).json(newFlight);
-    
+
   } catch (error) {
     console.error('Erro ao criar voo:', error);
     res.status(500).json({ error: 'Não foi possível cadastrar o voo.' });
@@ -178,9 +178,19 @@ app.get('/flights', async (req, res) => {
       },
     });
 
-    // 3. Retornamos os voos encontrados (pode ser um array vazio)
-    res.status(200).json(flights);
-    
+    const now = new Date(); // Pega a hora atual
+
+    // Mapeia os voos e adiciona o campo 'status'
+    const flightsWithStatus = flights.map(flight => {
+      const endTime = new Date(flight.endTime);
+      const status = endTime < now ? 'Concluído' : 'Agendado';
+
+      // Retorna o objeto do voo original + o novo campo de status
+      return { ...flight, status: status };
+    });
+    // --- FIM DA LÓGICA ---
+
+    res.status(200).json(flightsWithStatus);
   } catch (error) {
     // 4. Se algo der errado com o banco
     console.error('Erro ao listar voos:', error);
@@ -190,10 +200,10 @@ app.get('/flights', async (req, res) => {
 
 
 app.get('/', (req, res) => {
-    res.send('API Rower');
+  res.send('API Rower');
 });
 
 
-app.listen(PORT, ()=>{
-    console.log(`Servidor rodando na porta ${PORT}`)
+app.listen(PORT, () => {
+  console.log(`Servidor rodando na porta ${PORT}`)
 })

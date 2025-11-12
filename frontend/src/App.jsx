@@ -75,6 +75,7 @@ function App() {
   return (
     <div className="app-container">
       <header className="app-header">
+        <img src="/logo-rower.png" alt="Rower Logo" className="header-logo" />
         <h1>Gerenciador de Voos ROWER</h1>
       </header>
 

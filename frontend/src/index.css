@@ -76,6 +76,7 @@ body {
 }
 
 .flight-item {
+  text-align: center;
   background-color: #f9f9f9;
   border: 1px solid #eee;
   border-radius: 8px;
@@ -103,6 +104,7 @@ body {
   border: none;
   border-radius: 5px;
   padding: 8px 12px;
+  margin-left: 3px;
   font-weight: bold;
   cursor: pointer;
   margin-top: 10px;
@@ -253,4 +255,48 @@ body {
 
 .cancel-button:hover {
   background-color: var(--secondary-hover);
+}
+
+.flight-status {
+  /* display: inline-block; é a chave para o badge */
+  display: inline-block;
+  padding: 5px 12px;
+  border-radius: 15px;
+  /* Mais arredondado */
+  font-size: 0.8rem;
+  font-weight: bold;
+  margin-top: 10px;
+  text-transform: uppercase;
+}
+
+/* Cor para status 'Agendado' (cor primária) */
+.status-scheduled {
+  background-color: #d1eaf0;
+  color: var(--primary-color);
+}
+
+/* Cor para status 'Concluído' (neutro) */
+.status-completed {
+  background-color: #d1f0dc; /* Um cinza mais claro */
+  color: var(--primary-color);
+}
+
+
+
+.app-header {
+  background-color: var(--primary-color);
+  color: white;
+  padding: 10px 20px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  
+  /* Adicione estas duas linhas para alinhar */
+  display: flex;
+  align-items: center;
+}
+
+/* Adicione este novo estilo */
+.header-logo {
+  height: 40px; /* Defina a altura */
+  width: 40px;  /* Defina a largura */
+  margin-right: 15px; /* Dê espaço antes do título */
 }

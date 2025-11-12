@@ -1,0 +1,28 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Flight {
+  id             String   @id @default(uuid())
+  mission        String
+  startTime      DateTime
+  endTime        DateTime
+  operatorSarpas String   @db.VarChar(6)
+  droneSisant    String   @db.VarChar(10)
+
+  // Vamos salvar o polígono como um texto JSON por simplicidade
+  polygonJson String @db.Text
+
+  createdAt DateTime @default(now())
+}

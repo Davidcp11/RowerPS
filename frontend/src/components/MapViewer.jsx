@@ -1,6 +1,6 @@
 // src/components/MapViewer.jsx
 
-import React from 'react';
+import React, { useRef } from 'react';
 import { 
   MapContainer, 
   TileLayer, 
@@ -13,6 +13,8 @@ import { EditControl } from 'react-leaflet-draw'; // 2. Importe o EditControl
 
 // 3. Receba as novas props: 'onPolygonDrawn' e 'clearPolygonKey'
 function MapViewer({ selectedFlight, onMapReady, onPolygonDrawn, clearPolygonKey }) {
+  const featureGroupRef = useRef();
+
   const defaultPosition = [-14.235, -51.925];
   
   let polygonCoords = null;
@@ -24,13 +26,24 @@ function MapViewer({ selectedFlight, onMapReady, onPolygonDrawn, clearPolygonKey
   // 4. Função que é chamada quando o usuário TERMINA de desenhar
   const handlePolygonCreated = (e) => {
     const layer = e.layer;
-    // O Leaflet-Draw retorna {lat, lng}, que é o formato que nosso backend espera!
-    const coordinates = layer.getLatLngs()[0]; 
+    const latLngs = layer.getLatLngs()[0] || [];
     
-    // Envia os pontos para o App.jsx
+    const coordinates = latLngs.map(latLng => ({
+      lat: latLng.lat,
+      lng: latLng.lng
+    }));
+    
     onPolygonDrawn(coordinates);
   };
 
+  const handleDrawStart = () => {
+    // 4. Limpa manualmente as camadas ANTES de começar o novo desenho
+    // Isso NÃO causa uma re-renderização do React e não cancela o desenho.
+    if (featureGroupRef.current) {
+      featureGroupRef.current.clearLayers();
+    }
+  };
+  
   return (
     <MapContainer 
       center={defaultPosition} 
@@ -46,10 +59,11 @@ function MapViewer({ selectedFlight, onMapReady, onPolygonDrawn, clearPolygonKey
       />
       
       {/* 5. FeatureGroup é onde os desenhos vão ficar */}
-      <FeatureGroup>
+      <FeatureGroup key={clearPolygonKey} ref={featureGroupRef}>
         <EditControl
           position="topright"
           onCreated={handlePolygonCreated}
+          onDrawStart={handleDrawStart}
           draw={{
             rectangle: false,
             circle: false,
@@ -67,9 +81,7 @@ function MapViewer({ selectedFlight, onMapReady, onPolygonDrawn, clearPolygonKey
             // Desabilitamos a edição e deleção por enquanto
             edit: false,
             remove: false
-          }}
-          // 6. Esta 'key' é um truque para limpar o desenho
-          key={clearPolygonKey} 
+          }} 
         />
       </FeatureGroup>
       

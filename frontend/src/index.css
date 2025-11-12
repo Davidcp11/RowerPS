@@ -205,3 +205,52 @@ body {
   border-radius: 5px;
   margin-bottom: 15px;
 }
+
+.form-success-wrapper {
+  display: flex;
+  /* <-- A MÁGICA: alinha os itens lado a lado */
+  align-items: center;
+  /* <-- Alinha verticalmente */
+  justify-content: space-between;
+  /* <-- Coloca espaço entre o texto e o botão */
+
+  background-color: #DFF2BF;
+  border-radius: 5px;
+  margin-bottom: 15px;
+  /* Garante que o botão não "vaze" */
+  overflow: hidden;
+}
+
+/* * A tag <p> com a classe .form-success 
+ * (Não precisamos de regras novas aqui, apenas
+ * garantir que o seletor .form-success-wrapper p funcione)
+*/
+.form-success-wrapper p {
+  color: #4F8A10;
+  padding: 5px;
+  margin: 0;
+  flex-grow: 1;
+  /* Faz o texto ocupar o espaço disponível */
+}
+
+/* O botão "Refazer" */
+.cancel-button {
+  background-color: var(--secondary-color);
+  color: white;
+  border: none;
+  /* Arredonda só os cantos da direita */
+  border-radius: 0 5px 5px 0;
+  padding: 10px 12px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.2s ease;
+
+  /* Garante que o botão não encolha */
+  flex-shrink: 0;
+  /* Remove a borda preta do 'focus' */
+  outline: none;
+}
+
+.cancel-button:hover {
+  background-color: var(--secondary-hover);
+}

@@ -67,6 +67,11 @@ function App() {
     setClearPolygonKey(Date.now());
   };
 
+  const handleClearPolygon = () => {
+    setNewPolygonPoints([]); // Limpa os pontos do formulário
+    setClearPolygonKey(Date.now()); // Força o MapViewer a limpar o desenho
+  };
+
   return (
     <div className="app-container">
       <header className="app-header">
@@ -78,6 +83,7 @@ function App() {
           <FlightForm 
             polygonPoints={newPolygonPoints}
             onFlightCreated={handleFlightCreated}
+            onClearPolygon={handleClearPolygon}
           />
           {/* 5. Passe os dados dos voos (loading, error, flights) para o FlightList */}
           <FlightList 

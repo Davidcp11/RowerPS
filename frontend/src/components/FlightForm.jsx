@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import axios from 'axios'; 
 
-function FlightForm({ polygonPoints, onFlightCreated }) {
+function FlightForm({ polygonPoints, onFlightCreated, onClearPolygon }) {
   const [mission, setMission] = useState('');
   const [operatorSarpas, setOperatorSarpas] = useState('');
   const [droneSisant, setDroneSisant] = useState('');
@@ -142,16 +142,26 @@ function FlightForm({ polygonPoints, onFlightCreated }) {
       </div>
 
       {/* --- FIM DOS INPUTS QUE SUMIRAM --- */}
-      
-      {/* Mensagens de feedback */}
       {formError && (
         <p className="form-error">{formError}</p>
       )}
+
       {polygonPoints.length === 0 && !formError && (
         <p className="form-info">Use o ícone de polígono no mapa para desenhar a área.</p>
       )}
+
+      {/* 2. ENVOLVA A MENSAGEM DE SUCESSO E O BOTÃO */}
       {polygonPoints.length > 0 && !formError && (
-        <p className="form-success">Área do polígono definida!</p>
+        <div className="form-success-wrapper">
+          <p className="form-success">Área do polígono definida!</p>
+          <button 
+            type="button" 
+            className="cancel-button" 
+            onClick={onClearPolygon} // 3. CHAME A FUNÇÃO
+          >
+            Refazer
+          </button>
+        </div>
       )}
 
       <button type="submit" className="submit-button" disabled={submitting}>

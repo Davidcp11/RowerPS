@@ -5,12 +5,25 @@ import MapViewer from './components/MapViewer';
 import FlightList from './components/FlightList';
 
 function App() {
+  const [selectedFlight, setSelectedFlight] = useState(null);
+  // 1. Crie um estado para guardar a instância do mapa
+  const [mapInstance, setMapInstance] = useState(null);
 
-  const [selectedFlight, setSelectedFlight] = useState(null)
-
+  // 2. Modifique o 'handleFlightSelect'
   const handleFlightSelect = (flight) => {
-    setSelectedFlight(flight)
-  }
+    // 2a. Diga ao React qual polígono desenhar
+    setSelectedFlight(flight);
+
+    // 2b. Comande o mapa para se mover (se ele existir)
+    if (mapInstance) {
+      // Parseamos a lógica aqui no "controlador"
+      const parsedPolygon = JSON.parse(flight.polygonJson);
+      const polygonBounds = parsedPolygon.map(p => [p.lat, p.lng]);
+      
+      // Comando imperativo: "Mapa, mova-se para cá!"
+      mapInstance.fitBounds(polygonBounds, { padding: [50, 50] });
+    }
+  };
 
   return (
     <div className="app-container">
@@ -20,16 +33,16 @@ function App() {
 
       <main className="app-main">
         <div className="list-panel">
-          {/* <h2>Voos Agendados</h2> */}
           <FlightList 
-            onFlightSelect={handleFlightSelect}
+            onFlightSelect={handleFlightSelect} 
           />
         </div>
 
         <div className="map-panel">
-          {/* <h2>Mapa de Operações</h2> */}
-          <MapViewer
+          <MapViewer 
             selectedFlight={selectedFlight}
+            // 3. Passe a função 'setMapInstance' para o MapViewer
+            onMapReady={setMapInstance} 
           />
         </div>
       </main>

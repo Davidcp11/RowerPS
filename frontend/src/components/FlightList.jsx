@@ -1,69 +1,30 @@
 import React from 'react';
-// 1. Não precisamos mais de useState, useEffect ou axios
-// (Eles foram movidos para o App.jsx)
 
-// 2. Receba as novas props: loading, error, flights
-export default function FlightList({ loading, error, flights, onFlightSelect, filters, onFilterChange }) {
+// Removidas as props 'filters' e 'onFilterChange'
+function FlightList({ loading, error, flights, onFlightSelect }) {
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    onFilterChange(name, value); // Avisa o App.jsx
-  };
-  // 4. A lógica de renderização permanece a mesma,
-  //    pois ela agora usa as props
+  // A função 'handleChange' foi removida
+  
   if (loading) {
     return <p>Carregando voos...</p>;
   }
-
   if (error) {
     return <p style={{ color: 'red' }}>{error}</p>;
   }
 
   const formatDateTime = (isoString) => {
     return new Date(isoString).toLocaleString('pt-BR', {
-      hour: '2-digit',
-      minute: '2-digit',
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
+      hour: '2-digit', minute: '2-digit', day: '2-digit',
+      month: '2-digit', year: 'numeric',
     });
   };
 
   return (
     <div className="flight-list-container">
-      <div className="filter-container">
-        <h4>Filtrar Voos</h4>
-        <div className="form-group">
-          <input
-            type="text"
-            name="mission" // O 'name' deve bater com o estado
-            placeholder="Filtrar por Missão"
-            value={filters.mission}
-            onChange={handleChange}
-          />
-        </div>
-        <div className="form-group">
-          <input
-            type="text"
-            name="operatorSarpas"
-            placeholder="Filtrar por Operador"
-            value={filters.operatorSarpas}
-            onChange={handleChange}
-          />
-        </div>
-        <div className="form-group">
-          <input
-            type="text"
-            name="droneSisant"
-            placeholder="Filtrar por Drone"
-            value={filters.droneSisant}
-            onChange={handleChange}
-          />
-        </div>
-      </div>
-      {/* --- FIM DOS FILTROS --- */}
+      {/* O 'filter-container' foi REMOVIDO daqui */}
+      
       {flights.length === 0 ? (
-        <p>Nenhum voo cadastrado.</p>
+        <p>Nenhum voo encontrado.</p>
       ) : (
         <ul className="flight-list">
           {flights.map((flight) => (
@@ -89,3 +50,5 @@ export default function FlightList({ loading, error, flights, onFlightSelect, fi
     </div>
   );
 }
+
+export default FlightList;

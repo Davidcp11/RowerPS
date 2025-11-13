@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "NODE_ENV=test node --experimental-vm-modules node_modules/jest/bin/jest.js",
     "start": "nodemon index.js",
     "db:init": "dotenv -e .env -- npx prisma init",
     "db:gen": "dotenv -e .env -- npx prisma generate",
@@ -25,7 +25,9 @@
   },
   "devDependencies": {
     "dotenv-cli": "^11.0.0",
+    "jest": "^30.2.0",
     "nodemon": "^3.1.11",
-    "prisma": "^6.19.0"
+    "prisma": "^6.19.0",
+    "supertest": "^7.1.4"
   }
 }

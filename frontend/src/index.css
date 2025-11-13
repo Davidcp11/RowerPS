@@ -190,6 +190,7 @@ body {
   padding: 10px;
   border-radius: 5px;
   margin-bottom: 15px;
+  font-weight: bold;
 }
 
 .form-info {
@@ -208,15 +209,35 @@ body {
   margin-bottom: 15px;
 }
 
+
 .form-success-wrapper {
   display: flex;
   /* <-- A MÁGICA: alinha os itens lado a lado */
   align-items: center;
   /* <-- Alinha verticalmente */
-  justify-content: space-between;
+  justify-content: space-around;
   /* <-- Coloca espaço entre o texto e o botão */
 
   background-color: #DFF2BF;
+  font-size: 1rem;
+  font-weight: bold;
+  border-radius: 5px;
+  margin-bottom: 15px;
+  /* Garante que o botão não "vaze" */
+  overflow: hidden;
+}
+
+.form-error-wrapper {
+  display: flex;
+  /* <-- A MÁGICA: alinha os itens lado a lado */
+  align-items: center;
+  /* <-- Alinha verticalmente */
+  justify-content: space-around;
+  /* <-- Coloca espaço entre o texto e o botão */
+  color: #D8000C;
+  background-color: #FFD2D2;
+  font-size: 1rem;
+  font-weight: bold;
   border-radius: 5px;
   margin-bottom: 15px;
   /* Garante que o botão não "vaze" */
@@ -241,7 +262,7 @@ body {
   color: white;
   border: none;
   /* Arredonda só os cantos da direita */
-  border-radius: 0 5px 5px 0;
+  border-radius: 5px;
   padding: 10px 12px;
   cursor: pointer;
   font-weight: bold;
@@ -277,7 +298,8 @@ body {
 
 /* Cor para status 'Concluído' (neutro) */
 .status-completed {
-  background-color: #d1f0dc; /* Um cinza mais claro */
+  background-color: #d1f0dc;
+  /* Um cinza mais claro */
   color: var(--primary-color);
 }
 
@@ -288,7 +310,7 @@ body {
   color: white;
   padding: 10px 20px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-  
+
   /* Adicione estas duas linhas para alinhar */
   display: flex;
   align-items: center;
@@ -296,7 +318,49 @@ body {
 
 /* Adicione este novo estilo */
 .header-logo {
-  height: 40px; /* Defina a altura */
-  width: 40px;  /* Defina a largura */
-  margin-right: 15px; /* Dê espaço antes do título */
+  height: 40px;
+  /* Defina a altura */
+  width: 40px;
+  /* Defina a largura */
+  margin-right: 15px;
+  /* Dê espaço antes do título */
+}
+/* src/index.css */
+/* ... (outros estilos) ... */
+
+/* Estilos do Modal */
+.modal-overlay {
+  position: fixed; /* Cobre a tela inteira */
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6); /* Fundo escuro semi-transparente */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000; /* Fica na frente de tudo */
+}
+
+.modal-content {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.modal-body {
+  margin-bottom: 20px;
+}
+
+.modal-footer {
+  text-align: right;
+}
+
+/* Reutilizando o estilo do botão de submit */
+.modal-footer .submit-button {
+  width: auto;
+  padding: 10px 20px;
 }

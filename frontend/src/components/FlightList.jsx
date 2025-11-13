@@ -1,36 +1,30 @@
 import React from 'react';
-// 1. Não precisamos mais de useState, useEffect ou axios
-// (Eles foram movidos para o App.jsx)
 
-// 2. Receba as novas props: loading, error, flights
-export default function FlightList({ loading, error, flights, onFlightSelect }) {
+// Removidas as props 'filters' e 'onFilterChange'
+function FlightList({ loading, error, flights, onFlightSelect }) {
 
-  // 3. A lógica de useState, useEffect e fetchFlights foi REMOVIDA
-
-  // 4. A lógica de renderização permanece a mesma,
-  //    pois ela agora usa as props
+  // A função 'handleChange' foi removida
+  
   if (loading) {
     return <p>Carregando voos...</p>;
   }
-
   if (error) {
     return <p style={{ color: 'red' }}>{error}</p>;
   }
 
   const formatDateTime = (isoString) => {
     return new Date(isoString).toLocaleString('pt-BR', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
+      hour: '2-digit', minute: '2-digit', day: '2-digit',
+      month: '2-digit', year: 'numeric',
     });
   };
 
   return (
     <div className="flight-list-container">
+      {/* O 'filter-container' foi REMOVIDO daqui */}
+      
       {flights.length === 0 ? (
-        <p>Nenhum voo cadastrado.</p>
+        <p>Nenhum voo encontrado.</p>
       ) : (
         <ul className="flight-list">
           {flights.map((flight) => (
@@ -56,3 +50,5 @@ export default function FlightList({ loading, error, flights, onFlightSelect }) 
     </div>
   );
 }
+
+export default FlightList;

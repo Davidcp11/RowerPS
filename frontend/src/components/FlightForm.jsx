@@ -3,17 +3,33 @@
 import React, { useState } from 'react';
 import axios from 'axios'; 
 
+// 1. Defina o estado inicial do formulário aqui
+const initialFormState = {
+  mission: '',
+  operatorSarpas: '',
+  droneSisant: '',
+  startDate: '',
+  startTime: '',
+  endDate: '',
+  endTime: '',
+};
+
 function FlightForm({ polygonPoints, onFlightCreated, onClearPolygon }) {
-  const [mission, setMission] = useState('');
-  const [operatorSarpas, setOperatorSarpas] = useState('');
-  const [droneSisant, setDroneSisant] = useState('');
-  const [startDate, setStartDate] = useState('');
-  const [startTime, setStartTime] = useState('');
-  const [endDate, setEndDate] = useState('');
-  const [endTime, setEndTime] = useState('');
+  // 2. Use um único 'useState' para todos os campos do formulário
+  const [formData, setFormData] = useState(initialFormState);
   
+  // Os estados de controle permanecem separados (o que é bom)
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState(null);
+
+  // 3. Crie um 'handler' genérico para atualizar o estado do formulário
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prevData => ({
+      ...prevData,
+      [name]: value
+    }));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -26,29 +42,26 @@ function FlightForm({ polygonPoints, onFlightCreated, onClearPolygon }) {
     setSubmitting(true);
     setFormError(null);
 
-    const startISO = `${startDate}T${startTime}:00Z`;
-    const endISO = `${endDate}T${endTime}:00Z`;
+    // 4. Use os valores do objeto 'formData'
+    const startISO = `${formData.startDate}T${formData.startTime}:00Z`;
+    const endISO = `${formData.endDate}T${formData.endTime}:00Z`;
 
-    const formData = {
-      mission,
-      operatorSarpas,
-      droneSisant,
+    // Crie o objeto de envio
+    const submissionData = {
+      mission: formData.mission,
+      operatorSarpas: formData.operatorSarpas,
+      droneSisant: formData.droneSisant,
       startTime: startISO,
       endTime: endISO,
       polygonJson: polygonPoints, 
     };
 
     try {
-      await axios.post('http://localhost:3000/flights', formData);
+      const response = await axios.post('http://localhost:3000/flights', submissionData);
       
-      setMission('');
-      setOperatorSarpas('');
-      setDroneSisant('');
-      setStartDate('');
-      setStartTime('');
-      setEndDate('');
-      setEndTime('');
-      onFlightCreated(); 
+      // Limpar o formulário é muito mais fácil agora!
+      setFormData(initialFormState); 
+      onFlightCreated(response.data); 
 
     } catch (err) {
       if (err.response && err.response.data && err.response.data.error) {
@@ -66,14 +79,20 @@ function FlightForm({ polygonPoints, onFlightCreated, onClearPolygon }) {
     <form className="flight-form" onSubmit={handleSubmit}>
       <h3>Cadastrar Novo Voo</h3>
       
-      {/* --- INÍCIO DOS INPUTS QUE SUMIRAM --- */}
+      {/* --- MUDANÇA NOS INPUTS ---
+        Agora, cada input usa:
+        1. value={formData.nomeDoCampo}
+        2. onChange={handleChange}
+        3. name="nomeDoCampo" (IMPORTANTE!)
+      */}
       
       <div className="form-group">
         <label>Missão</label>
         <input 
           type="text" 
-          value={mission}
-          onChange={(e) => setMission(e.target.value)}
+          name="mission" // Adicionado
+          value={formData.mission} // Mudou
+          onChange={handleChange} // Mudou
           required 
         />
       </div>
@@ -82,8 +101,9 @@ function FlightForm({ polygonPoints, onFlightCreated, onClearPolygon }) {
         <label>SARPAS do Operador (ex: 123ABC)</label>
         <input 
           type="text" 
-          value={operatorSarpas}
-          onChange={(e) => setOperatorSarpas(e.target.value)}
+          name="operatorSarpas" // Adicionado
+          value={formData.operatorSarpas} // Mudou
+          onChange={handleChange} // Mudou
           required 
           maxLength={6}
         />
@@ -93,8 +113,9 @@ function FlightForm({ polygonPoints, onFlightCreated, onClearPolygon }) {
         <label>SISANT do Drone (ex: PP-1234567)</label>
         <input 
           type="text" 
-          value={droneSisant}
-          onChange={(e) => setDroneSisant(e.target.value)}
+          name="droneSisant" // Adicionado
+          value={formData.droneSisant} // Mudou
+          onChange={handleChange} // Mudou
           required 
         />
       </div>
@@ -104,8 +125,9 @@ function FlightForm({ polygonPoints, onFlightCreated, onClearPolygon }) {
           <label>Data Início</label>
           <input 
             type="date" 
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
+            name="startDate" // Adicionado
+            value={formData.startDate} // Mudou
+            onChange={handleChange} // Mudou
             required 
           />
         </div>
@@ -113,8 +135,9 @@ function FlightForm({ polygonPoints, onFlightCreated, onClearPolygon }) {
           <label>Hora Início</label>
           <input 
             type="time" 
-            value={startTime}
-            onChange={(e) => setStartTime(e.target.value)}
+            name="startTime" // Adicionado
+            value={formData.startTime} // Mudou
+            onChange={handleChange} // Mudou
             required 
           />
         </div>
@@ -125,8 +148,9 @@ function FlightForm({ polygonPoints, onFlightCreated, onClearPolygon }) {
           <label>Data Fim</label>
           <input 
             type="date" 
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
+            name="endDate" // Adicionado
+            value={formData.endDate} // Mudou
+            onChange={handleChange} // Mudou
             required 
           />
         </div>
@@ -134,14 +158,17 @@ function FlightForm({ polygonPoints, onFlightCreated, onClearPolygon }) {
           <label>Hora Fim</label>
           <input 
             type="time" 
-            value={endTime}
-            onChange={(e) => setEndTime(e.target.value)}
+            name="endTime" // Adicionado
+            value={formData.endTime} // Mudou
+            onChange={handleChange} // Mudou
             required 
           />
         </div>
       </div>
 
-      {/* --- FIM DOS INPUTS QUE SUMIRAM --- */}
+      {/* --- O restante do formulário (feedback de erro, botões) --- */}
+      {/* Nenhuma mudança necessária aqui */}
+
       {formError && (
         <p className="form-error">{formError}</p>
       )}
@@ -150,14 +177,18 @@ function FlightForm({ polygonPoints, onFlightCreated, onClearPolygon }) {
         <p className="form-info">Use o ícone de polígono no mapa para desenhar a área.</p>
       )}
 
-      {/* 2. ENVOLVA A MENSAGEM DE SUCESSO E O BOTÃO */}
-      {polygonPoints.length > 0 && !formError && (
-        <div className="form-success-wrapper">
-          <p className="form-success">Área do polígono definida!</p>
+      {polygonPoints.length > 0 && (
+        <div className={!!formError ? "form-success-wrapper":"form-error-wrapper"}>
+          {!!formError ? (
+            <p>Área do polígono definida!</p>
+          ) : (
+            <p>Escolha outro polígono!</p>
+          )}
+
           <button 
             type="button" 
             className="cancel-button" 
-            onClick={onClearPolygon} // 3. CHAME A FUNÇÃO
+            onClick={onClearPolygon}
           >
             Refazer
           </button>

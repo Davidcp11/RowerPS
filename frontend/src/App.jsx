@@ -1,47 +1,24 @@
-import React, { useState, useEffect } from 'react'; // 1. Importe useEffect
-import axios from 'axios'; // 2. Importe axios
+// src/App.jsx
+
+import React, { useState } from 'react';
 import MapViewer from './components/MapViewer';
-import FlightList from './components/FlightList';
-import FlightForm from './components/FlightForm';
-
-
+import Sidebar from './components/Sidebar'; // 1. IMPORTE O NOVO SIDEBAR
 
 function App() {
-  // --- Estados do 'Filho' (FlightList) movidos para o 'Pai' (App) ---
-  const [flights, setFlights] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  // -----------------------------------------------------------------
-
+  
+  // --- 2. ESTADOS QUE SÃO REALMENTE GLOBAIS ---
+  // (Porque o Sidebar e o MapViewer precisam deles)
   const [selectedFlight, setSelectedFlight] = useState(null);
   const [mapInstance, setMapInstance] = useState(null);
-
-  // 1. Guarda os pontos do polígono que o usuário desenhou
   const [newPolygonPoints, setNewPolygonPoints] = useState([]);
-  // 2. A 'key' para forçar o MapViewer a limpar o desenho
   const [clearPolygonKey, setClearPolygonKey] = useState(Date.now());
 
-  // 3. Crie a função de busca de voos aqui
-  const fetchFlights = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await axios.get('http://localhost:3000/flights');
-      setFlights(response.data);
-    } catch (err) {
-      setError('Não foi possível carregar os voos.');
-      console.error('Erro ao buscar voos:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // --- 3. LÓGICA DE DADOS REMOVIDA (foi para o Sidebar) ---
+  // O 'flights', 'loading', 'error', 'filters', 'modalData'
+  // E as funções 'fetchFlights', 'handleFilterChange', etc.
+  // ... TUDO FOI REMOVIDO! ...
 
-  // 4. Use o useEffect para buscar os voos na inicialização
-  useEffect(() => {
-    fetchFlights();
-  }, []); // O array vazio [] garante que rode só uma vez
-
-  // Função de seleção de voo (sem alteração)
+  // --- 4. HANDLERS GLOBAIS ---
   const handleFlightSelect = (flight) => {
     setSelectedFlight(flight);
     if (mapInstance) {
@@ -51,25 +28,13 @@ function App() {
     }
   };
 
-  // 3. Função que será chamada pelo MapViewer
   const handlePolygonDrawn = (coordinates) => {
-    console.log('Polígono desenhado:', coordinates);
     setNewPolygonPoints(coordinates);
   };
   
-  // 4. Função que será chamada pelo FlightForm
-  const handleFlightCreated = () => {
-    // 4a. Recarregar a lista de voos
-    fetchFlights();
-    // 4b. Limpar o polígono desenhado
-    setNewPolygonPoints([]);
-    // 4c. Forçar o MapViewer a limpar o desenho (nova key)
-    setClearPolygonKey(Date.now());
-  };
-
   const handleClearPolygon = () => {
-    setNewPolygonPoints([]); // Limpa os pontos do formulário
-    setClearPolygonKey(Date.now()); // Força o MapViewer a limpar o desenho
+    setNewPolygonPoints([]);
+    setClearPolygonKey(Date.now());
   };
 
   return (
@@ -80,21 +45,14 @@ function App() {
       </header>
 
       <main className="app-main">
-        <div className="list-panel">
-          <FlightForm 
-            polygonPoints={newPolygonPoints}
-            onFlightCreated={handleFlightCreated}
-            onClearPolygon={handleClearPolygon}
-          />
-          {/* 5. Passe os dados dos voos (loading, error, flights) para o FlightList */}
-          <FlightList 
-            loading={loading}
-            error={error}
-            flights={flights}
-            onFlightSelect={handleFlightSelect} 
-          />
-        </div>
+        {/* 5. RENDERIZE O SIDEBAR */}
+        <Sidebar 
+          onFlightSelect={handleFlightSelect}
+          newPolygonPoints={newPolygonPoints}
+          onClearPolygon={handleClearPolygon}
+        />
 
+        {/* 6. O MAPA (sem alteração) */}
         <div className="map-panel">
           <MapViewer 
             selectedFlight={selectedFlight}
@@ -104,6 +62,8 @@ function App() {
           />
         </div>
       </main>
+
+      {/* O MODAL FOI REMOVIDO DAQUI (está no Sidebar) */}
     </div>
   );
 }

@@ -96,14 +96,23 @@ app.post('/flights', async (req, res) => {
     // --- 6. VALIDAÇÃO DE CONFLITO ESPACIAL (POLÍGONO) ---
 
     // 6a. Encontrar voos simultâneos (qualquer voo que "toque" o novo período)
+    const now = new Date();
+
+    // 6a. Encontrar voos simultâneos E QUE AINDA NÃO FORAM CONCLUÍDOS
     const simultaneousFlights = await prisma.flight.findMany({
       where: {
+
+        // 2. NOVO FILTRO:
+        // Só cheque contra voos cujo horário de término
+        // ainda está no FUTURO (ou seja, 'Agendado')
+        endTime: { gt: now },
+
+        // 3. REGRA ANTIGA:
+        // E que sejam simultâneos
         AND: [
           { startTime: { lt: newEndTime } }, // Início Existente < Fim Novo
           { endTime: { gt: newStartTime } }, // Fim Existente > Início Novo
         ],
-        // Otimização: Não precisamos checar contra o mesmo drone/operador
-        // pois isso já foi barrado nas validações anteriores.
       },
     });
 
@@ -139,7 +148,7 @@ app.post('/flights', async (req, res) => {
         if (intersects) {
           // Se houver QUALQUER intersecção, bloqueamos
           return res.status(409).json({
-            error: `Conflito espacial: O polígono do voo intercepta o voo [${flight.mission}] (ID: ${flight.id}).`,
+            error: `Conflito espacial: O polígono do voo intercepta o voo ${flight.mission}.`,
           });
         }
       }
@@ -170,29 +179,59 @@ app.post('/flights', async (req, res) => {
  */
 app.get('/flights', async (req, res) => {
   try {
-    // 1. Buscamos TODOS os voos no banco de dados
+    // 1. Capture os filtros da URL (ex: /flights?mission=Teste)
+    const { mission, operatorSarpas, droneSisant } = req.query;
+
+    // 2. Construa a cláusula 'where' dinamicamente
+    const whereClause = {
+      AND: [], // Usamos AND para que todos os filtros se apliquem
+    };
+
+    if (mission) {
+      whereClause.AND.push({
+        mission: {
+          contains: mission, // 'contains' é como o 'LIKE' do SQL (busca parcial)
+          mode: 'insensitive', // Não diferencia maiúsculas/minúsculas
+        },
+      });
+    }
+    if (operatorSarpas) {
+      whereClause.AND.push({
+        operatorSarpas: {
+          contains: operatorSarpas,
+          mode: 'insensitive',
+        },
+      });
+    }
+    if (droneSisant) {
+      whereClause.AND.push({
+        droneSisant: {
+          contains: droneSisant,
+          mode: 'insensitive',
+        },
+      });
+    }
+
+    // 3. Busque os voos usando os filtros
     const flights = await prisma.flight.findMany({
-      // 2. Adicionamos a regra de ordenação
+      where: whereClause, // Aplica o 'where'
       orderBy: {
-        startTime: 'desc', // 'desc' = decrescente
+        startTime: 'desc',
       },
     });
 
-    const now = new Date(); // Pega a hora atual
-
-    // Mapeia os voos e adiciona o campo 'status'
+    // --- Lógica do Status (sem alteração) ---
+    const now = new Date();
     const flightsWithStatus = flights.map(flight => {
       const endTime = new Date(flight.endTime);
       const status = endTime < now ? 'Concluído' : 'Agendado';
-
-      // Retorna o objeto do voo original + o novo campo de status
       return { ...flight, status: status };
     });
-    // --- FIM DA LÓGICA ---
+    // --- Fim da Lógica ---
 
     res.status(200).json(flightsWithStatus);
+
   } catch (error) {
-    // 4. Se algo der errado com o banco
     console.error('Erro ao listar voos:', error);
     res.status(500).json({ error: 'Não foi possível buscar os voos.' });
   }

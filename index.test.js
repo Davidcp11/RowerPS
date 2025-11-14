@@ -2,6 +2,7 @@
 import request from 'supertest';
 import { jest } from '@jest/globals';
 
+
 // Mock do Prisma Client e do Turf
 const mockPrisma = {
   flight: {

@@ -111,7 +111,6 @@ export default function App() {
               onFlightCreated={handleFlightCreated}
               onClearPolygon={handleClearPolygon}
             />
-            
             <FlightList 
               loading={loading}
               error={error}
@@ -119,6 +118,7 @@ export default function App() {
               onFlightSelect={handleFlightSelect}
               filters={filters}
               onFilterChange={handleFilterChange}
+              selectedFlightId={selectedFlight?.id}
             />
           </div>
 

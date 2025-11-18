@@ -16,7 +16,15 @@ import {
 import SearchIcon from '@mui/icons-material/Search';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
 
-export default function FlightList({ loading, error, flights, onFlightSelect, filters, onFilterChange }) {
+export default function FlightList({
+  loading,
+  error,
+  flights,
+  onFlightSelect,
+  filters,
+  onFilterChange,
+  selectedFlightId
+}) {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -113,77 +121,60 @@ export default function FlightList({ loading, error, flights, onFlightSelect, fi
       )}
 
       <Stack spacing={2}>
-        {flights.map((flight) => (
-          <Card 
-            key={flight.id} 
-            elevation={2} 
-            sx={{ 
-              textAlign: 'center',
-              borderRadius: 3, 
-              transition: 'transform 0.2s',
-              '&:hover': { transform: 'translateY(-2px)', boxShadow: 4 }
-            }}
-          >
-            <CardContent sx={{ pb: 2 }}>
-              <Typography variant="h6" color="primary" sx={{ fontWeight: 'bold', mb: 0.5 }}>
-                {flight.mission}
-              </Typography>
+        {flights.map((flight) => {
+          const isSelected = flight.id === selectedFlightId;
 
-              <Typography variant="body2" color="text.secondary">
-                Drone: {flight.droneSisant}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Operador: {flight.operatorSarpas}
-              </Typography>
-
-              <Box sx={{ my: 2 }}>
-                <Typography variant="subtitle2" color="primary" sx={{ fontWeight: 'bold' }}>
-                  Início:
-                </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                  {formatDateTime(flight.startTime)}
+          return (
+            <Card 
+              key={flight.id} 
+              elevation={isSelected ? 8 : 2}
+              sx={{ 
+                textAlign: 'center', 
+                borderRadius: 3,
+                transition: 'all 0.3s ease', 
+                cursor: 'pointer',
+                border: isSelected ? '2px solid #016C72' : '1px solid transparent',
+                backgroundColor: isSelected ? '#f2fafa' : 'white',
+                transform: isSelected ? 'scale(1.02)' : 'scale(1)',
+                
+                '&:hover': { transform: 'translateY(-2px)', boxShadow: 4 }
+              }}
+              onClick={() => onFlightSelect(flight)}
+            >
+              <CardContent sx={{ pb: 2 }}>
+                <Typography variant="h6" color="primary" sx={{ fontWeight: 'bold', mb: 0.5 }}>
+                  {flight.mission}
                 </Typography>
 
-                <Typography variant="subtitle2" color="primary" sx={{ fontWeight: 'bold' }}>
-                  Fim:
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {formatDateTime(flight.endTime)}
-                </Typography>
-              </Box>
+                <Typography variant="body2" color="text.secondary">Drone: {flight.droneSisant}</Typography>
+                <Typography variant="body2" color="text.secondary">Operador: {flight.operatorSarpas}</Typography>
 
-              <Stack 
-                direction="row" 
-                justifyContent="center" 
-                alignItems="center" 
-                spacing={2}
-                sx={{ mt: 1 }}
-              >
-                <Chip 
-                  label={flight.status} 
-                  sx={getStatusStyles(flight.status)}
-                />
+                <Box sx={{ my: 2 }}>
+                  <Typography variant="subtitle2" color="primary" sx={{ fontWeight: 'bold' }}>Início:</Typography>
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>{formatDateTime(flight.startTime)}</Typography>
+                  <Typography variant="subtitle2" color="primary" sx={{ fontWeight: 'bold' }}>Fim:</Typography>
+                  <Typography variant="body2" color="text.secondary">{formatDateTime(flight.endTime)}</Typography>
+                </Box>
 
-                <Button 
-                  variant="contained" 
-                  color="secondary" 
-                  onClick={() => onFlightSelect(flight)}
-                  disableElevation
-                  sx={{ 
-                    fontWeight: 'bold', 
-                    color: 'white',
-                    textTransform: 'none',
-                    borderRadius: 2,
-                    px: 2
-                  }}
-                >
-                  Ver no Mapa
-                </Button>
-              </Stack>
-
-            </CardContent>
-          </Card>
-        ))}
+                <Stack direction="row" justifyContent="center" alignItems="center" spacing={2} sx={{ mt: 1 }}>
+                  <Chip label={flight.status} sx={getStatusStyles(flight.status)} />
+                  <Button 
+                    variant="contained" 
+                    color="secondary" 
+                    onClick={(e) => {
+                      e.stopPropagation(); // Evita clique duplo se o card já for clicável
+                      onFlightSelect(flight);
+                    }} 
+                    disableElevation
+                    sx={{ fontWeight: 'bold', color: 'white', textTransform: 'none', borderRadius: 2, px: 2 }}
+                  >
+                    Ver no Mapa
+                  </Button>
+                </Stack>
+              </CardContent>
+            </Card>
+          );
+        })}
       </Stack>
     </Box>
   );

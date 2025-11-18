@@ -214,9 +214,19 @@ app.get('/flights', async (req, res) => {
 
     // Lógica do Status (sem alteração)
     const now = new Date();
+    
     const flightsWithStatus = flights.map(flight => {
+      const startTime = new Date(flight.startTime);
       const endTime = new Date(flight.endTime);
-      const status = endTime < now ? 'Concluído' : 'Agendado';
+      
+      let status = 'Agendado'; // Padrão
+
+      if (endTime < now) {
+        status = 'Concluído';
+      } else if (startTime <= now && endTime >= now) {
+        status = 'Em Curso'; // Novo status!
+      }
+      
       return { ...flight, status: status };
     });
     // Fim da Lógica

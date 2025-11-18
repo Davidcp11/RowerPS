@@ -47,17 +47,29 @@ export default function FlightList({
     if (status === 'Concluído') {
       return {
         bgcolor: '#E0E0E0', 
-        color: '#757575',
-        fontWeight: 'bold',
-        textTransform: 'uppercase',
+        color: '#757575', 
+        fontWeight: 'bold', 
+        textTransform: 'uppercase', 
         border: 'none'
       };
     }
+    
+    if (status === 'Em Curso') {
+      return {
+        bgcolor: '#E0F7FA',
+        color: '#006064',   
+        fontWeight: 'bold',
+        textTransform: 'uppercase',
+        border: '1px solid #006064' 
+      };
+    }
+
+    
     return {
       bgcolor: '#E0F7FA', 
-      color: '#006064',   
-      fontWeight: 'bold',
-      textTransform: 'uppercase',
+      color: '#006064', 
+      fontWeight: 'bold', 
+      textTransform: 'uppercase', 
       border: 'none'
     };
   };

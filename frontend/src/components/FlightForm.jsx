@@ -143,7 +143,7 @@ export default function FlightForm({ polygonPoints, onFlightCreated, onClearPoly
               fullWidth
               label="SISANT"
               name="droneSisant"
-              placeholder="PP-12345"
+              placeholder="PP-1234567"
               value={formData.droneSisant}
               onChange={handleChange}
               slotProps={{

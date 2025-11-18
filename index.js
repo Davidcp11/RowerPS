@@ -25,7 +25,6 @@ app.post('/flights', async (req, res) => {
       polygonJson,
     } = req.body;
 
-    // --- 1. Validação de Campos Obrigatórios (Já tínhamos) ---
     if (
       !mission ||
       !startTime ||
@@ -37,22 +36,19 @@ app.post('/flights', async (req, res) => {
       return res.status(400).json({ error: 'Todos os campos são obrigatórios.' });
     }
 
-    // Convertemos as strings de data em objetos Date logo no início
     const newStartTime = new Date(startTime);
     const newEndTime = new Date(endTime);
 
-    // Validação simples: O fim não pode ser antes do início
     if (newEndTime <= newStartTime) {
       return res.status(400).json({ error: 'O horário de fim deve ser após o horário de início.' });
     }
 
-    // --- 2. Validação de Regra de Negócio: Conflito de Drone  ---
     const conflictingDroneFlight = await prisma.flight.findMany({
       where: {
-        droneSisant: droneSisant, // 1. Mesmo drone
+        droneSisant: droneSisant, // Mesmo drone
         AND: [
-          { startTime: { lt: newEndTime } }, // 2. E (Início Existente < Fim Novo)
-          { endTime: { gt: newStartTime } }, // 3. E (Fim Existente > Início Novo)
+          { startTime: { lt: newEndTime } }, // E (Início Existente < Fim Novo)
+          { endTime: { gt: newStartTime } }, // E (Fim Existente > Início Novo)
         ],
       },
     });
@@ -63,13 +59,12 @@ app.post('/flights', async (req, res) => {
       });
     }
 
-    // --- 3. Validação de Regra de Negócio: Conflito de Operador  ---
     const conflictingOperatorFlight = await prisma.flight.findMany({
       where: {
-        operatorSarpas: operatorSarpas, // 1. Mesmo operador
+        operatorSarpas: operatorSarpas, // Mesmo operador
         AND: [
-          { startTime: { lt: newEndTime } }, // 2. E (Início Existente < Fim Novo)
-          { endTime: { gt: newStartTime } }, // 3. E (Fim Existente > Início Novo)
+          { startTime: { lt: newEndTime } }, // E (Início Existente < Fim Novo)
+          { endTime: { gt: newStartTime } }, // E (Fim Existente > Início Novo)
         ],
       },
     });
@@ -80,7 +75,7 @@ app.post('/flights', async (req, res) => {
       });
     }
 
-    // --- 4. Validação de Formato (Bônus, mas importante) ---
+    // Validação de Formato  ---
     // SARPAS: 3 números, 3 letras, qualquer ordem, 6 chars total
     const sarpasRegex = /^(?=[a-zA-Z0-9]{6}$)(?=(?:.*[a-zA-Z]){3})(?=(?:.*\d){3}).*$/;
     if (!sarpasRegex.test(operatorSarpas)) {
@@ -93,21 +88,18 @@ app.post('/flights', async (req, res) => {
       return res.status(400).json({ error: 'Formato de SISANT inválido. Deve ser PP-xxxxxxx.' });
     }
 
-    // --- 6. VALIDAÇÃO DE CONFLITO ESPACIAL (POLÍGONO) ---
+    // VALIDAÇÃO DE CONFLITO ESPACIAL (POLÍGONO) 
 
-    // 6a. Encontrar voos simultâneos (qualquer voo que "toque" o novo período)
+    // Encontrar voos simultâneos (qualquer voo que "toque" o novo período)
     const now = new Date();
 
     // 6a. Encontrar voos simultâneos E QUE AINDA NÃO FORAM CONCLUÍDOS
     const simultaneousFlights = await prisma.flight.findMany({
       where: {
-
-        // 2. NOVO FILTRO:
         // Só cheque contra voos cujo horário de término
         // ainda está no FUTURO (ou seja, 'Agendado')
         endTime: { gt: now },
 
-        // 3. REGRA ANTIGA:
         // E que sejam simultâneos
         AND: [
           { startTime: { lt: newEndTime } }, // Início Existente < Fim Novo
@@ -117,7 +109,7 @@ app.post('/flights', async (req, res) => {
     });
 
     if (simultaneousFlights.length > 0) {
-      // 6b. Criar o polígono do "novo" voo com o Turf
+      // Criar o polígono do "novo" voo com o Turf
       // Nota: O Turf exige que o polígono seja "fechado"
       // (o primeiro e o último ponto devem ser iguais).
       const newPolygonCoords = [...polygonJson, polygonJson[0]]; // Fecha o polígono
@@ -130,7 +122,7 @@ app.post('/flights', async (req, res) => {
       ]);
 
 
-      // 6c. Iterar sobre os voos simultâneos e checar a intersecção
+      // Iterar sobre os voos simultâneos e checar a intersecção
       for (const flight of simultaneousFlights) {
 
         // Converte o polígono salvo no banco (string) de volta para JSON
@@ -142,7 +134,7 @@ app.post('/flights', async (req, res) => {
           existingPolygonCoords.map(p => [p.lng, p.lat])
         ]);
 
-        // 6d. A checagem mágica!
+        // A checagem de interseccao
         const intersects = turf.booleanIntersects(newTurfPolygon, existingTurfPolygon);
 
         if (intersects) {
@@ -153,7 +145,7 @@ app.post('/flights', async (req, res) => {
         }
       }
     }
-    // --- 7. Se todas as validações passaram, criar o voo ---
+    // Se todas as validações passaram, criar o voo
     const newFlight = await prisma.flight.create({
       data: {
         mission: mission,
@@ -179,10 +171,10 @@ app.post('/flights', async (req, res) => {
  */
 app.get('/flights', async (req, res) => {
   try {
-    // 1. Capture os filtros da URL (ex: /flights?mission=Teste)
+    // Capture os filtros da URL
     const { mission, operatorSarpas, droneSisant } = req.query;
 
-    // 2. Construa a cláusula 'where' dinamicamente
+    // Construa a cláusula 'where' dinamicamente
     const whereClause = {
       AND: [], // Usamos AND para que todos os filtros se apliquem
     };
@@ -190,7 +182,7 @@ app.get('/flights', async (req, res) => {
     if (mission) {
       whereClause.AND.push({
         mission: {
-          contains: mission, // 'contains' é como o 'LIKE' do SQL (busca parcial)
+          contains: mission, // 'contains' === 'LIKE' do SQL
           mode: 'insensitive', // Não diferencia maiúsculas/minúsculas
         },
       });
@@ -212,7 +204,7 @@ app.get('/flights', async (req, res) => {
       });
     }
 
-    // 3. Busque os voos usando os filtros
+    // Busque os voos usando os filtros
     const flights = await prisma.flight.findMany({
       where: whereClause, // Aplica o 'where'
       orderBy: {
@@ -220,14 +212,14 @@ app.get('/flights', async (req, res) => {
       },
     });
 
-    // --- Lógica do Status (sem alteração) ---
+    // Lógica do Status (sem alteração)
     const now = new Date();
     const flightsWithStatus = flights.map(flight => {
       const endTime = new Date(flight.endTime);
       const status = endTime < now ? 'Concluído' : 'Agendado';
       return { ...flight, status: status };
     });
-    // --- Fim da Lógica ---
+    // Fim da Lógica
 
     res.status(200).json(flightsWithStatus);
 

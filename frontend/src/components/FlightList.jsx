@@ -1,9 +1,5 @@
-import React from 'react';
 
-// Removidas as props 'filters' e 'onFilterChange'
-function FlightList({ loading, error, flights, onFlightSelect }) {
-
-  // A função 'handleChange' foi removida
+export default function FlightList({ loading, error, flights, onFlightSelect }) {
   
   if (loading) {
     return <p>Carregando voos...</p>;
@@ -20,9 +16,7 @@ function FlightList({ loading, error, flights, onFlightSelect }) {
   };
 
   return (
-    <div className="flight-list-container">
-      {/* O 'filter-container' foi REMOVIDO daqui */}
-      
+    <div className="flight-list-container">      
       {flights.length === 0 ? (
         <p>Nenhum voo encontrado.</p>
       ) : (
@@ -50,5 +44,3 @@ function FlightList({ loading, error, flights, onFlightSelect }) {
     </div>
   );
 }
-
-export default FlightList;

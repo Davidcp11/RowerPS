@@ -1,8 +1,4 @@
-// src/components/FilterForm.jsx
 
-import React from 'react';
-
-// Este componente apenas recebe o estado dos filtros e a função de 'change'
 function FilterForm({ filters, onFilterChange }) {
   
   const handleChange = (e) => {

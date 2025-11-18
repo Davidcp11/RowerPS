@@ -1,24 +1,14 @@
-// src/App.jsx
-
-import React, { useState } from 'react';
+import { useState } from 'react';
 import MapViewer from './components/MapViewer';
-import Sidebar from './components/Sidebar'; // 1. IMPORTE O NOVO SIDEBAR
+import Sidebar from './components/Sidebar';
 
-function App() {
+export default function App() {
   
-  // --- 2. ESTADOS QUE SÃO REALMENTE GLOBAIS ---
-  // (Porque o Sidebar e o MapViewer precisam deles)
   const [selectedFlight, setSelectedFlight] = useState(null);
   const [mapInstance, setMapInstance] = useState(null);
   const [newPolygonPoints, setNewPolygonPoints] = useState([]);
   const [clearPolygonKey, setClearPolygonKey] = useState(Date.now());
-
-  // --- 3. LÓGICA DE DADOS REMOVIDA (foi para o Sidebar) ---
-  // O 'flights', 'loading', 'error', 'filters', 'modalData'
-  // E as funções 'fetchFlights', 'handleFilterChange', etc.
-  // ... TUDO FOI REMOVIDO! ...
-
-  // --- 4. HANDLERS GLOBAIS ---
+  
   const handleFlightSelect = (flight) => {
     setSelectedFlight(flight);
     if (mapInstance) {
@@ -45,14 +35,12 @@ function App() {
       </header>
 
       <main className="app-main">
-        {/* 5. RENDERIZE O SIDEBAR */}
         <Sidebar 
           onFlightSelect={handleFlightSelect}
           newPolygonPoints={newPolygonPoints}
           onClearPolygon={handleClearPolygon}
         />
 
-        {/* 6. O MAPA (sem alteração) */}
         <div className="map-panel">
           <MapViewer 
             selectedFlight={selectedFlight}
@@ -62,10 +50,6 @@ function App() {
           />
         </div>
       </main>
-
-      {/* O MODAL FOI REMOVIDO DAQUI (está no Sidebar) */}
     </div>
   );
-}
-
-export default App;
+};

@@ -1,6 +1,4 @@
-// src/components/Sidebar.jsx
-
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 
 import FlightForm from './FlightForm';
@@ -8,10 +6,8 @@ import FilterForm from './FilterForm';
 import FlightList from './FlightList';
 import Modal from './Modal';
 
-// O Sidebar recebe as props do 'App' que são compartilhadas com o Mapa
-function Sidebar({ onFlightSelect, newPolygonPoints, onClearPolygon }) {
+export default function Sidebar({ onFlightSelect, newPolygonPoints, onClearPolygon }) {
 
-  // --- 1. Lógica de DADOS (movida do App.jsx) ---
   const [flights, setFlights] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -19,10 +15,8 @@ function Sidebar({ onFlightSelect, newPolygonPoints, onClearPolygon }) {
     mission: '', operatorSarpas: '', droneSisant: ''
   });
 
-  // --- 2. Lógica do MODAL (movida do App.jsx) ---
   const [modalData, setModalData] = useState(null);
 
-  // Função de busca de voos
   const fetchFlights = async () => {
     setLoading(true);
     setError(null);
@@ -39,7 +33,6 @@ function Sidebar({ onFlightSelect, newPolygonPoints, onClearPolygon }) {
     }
   };
 
-  // useEffect para buscar dados quando os filtros mudam
   useEffect(() => {
     const fetchTimeout = setTimeout(() => {
       fetchFlights();
@@ -47,7 +40,6 @@ function Sidebar({ onFlightSelect, newPolygonPoints, onClearPolygon }) {
     return () => clearTimeout(fetchTimeout);
   }, [filters]);
 
-  // Handler para atualizar os filtros
   const handleFilterChange = (filterName, filterValue) => {
     setFilters(prevFilters => ({
       ...prevFilters,
@@ -55,15 +47,11 @@ function Sidebar({ onFlightSelect, newPolygonPoints, onClearPolygon }) {
     }));
   };
 
-  // Handler para quando um voo é criado
   const handleFlightCreated = (newFlight) => {
-    fetchFlights(); // Apenas recarrega a lista
+    fetchFlights();
     setModalData(newFlight); // Abre o modal
-    // A limpeza do polígono ainda é controlada pelo App,
-    // mas o 'onClearPolygon' é chamado pelo FlightForm
   };
 
-  // Função para formatar a data (para o modal)
   const formatDateTime = (isoString) => {
     return new Date(isoString).toLocaleString('pt-BR', {
       day: '2-digit', month: '2-digit', year: 'numeric',
@@ -72,7 +60,6 @@ function Sidebar({ onFlightSelect, newPolygonPoints, onClearPolygon }) {
   };
 
   return (
-    // O 'list-panel' agora é o Sidebar
     <div className="list-panel">
       <FlightForm 
         polygonPoints={newPolygonPoints}
@@ -87,10 +74,9 @@ function Sidebar({ onFlightSelect, newPolygonPoints, onClearPolygon }) {
         loading={loading}
         error={error}
         flights={flights}
-        onFlightSelect={onFlightSelect} // Passa o 'handler' do App para o FlightList
+        onFlightSelect={onFlightSelect} 
       />
 
-      {/* O Modal agora 'vive' dentro do Sidebar */}
       <Modal 
         isOpen={!!modalData}
         onClose={() => setModalData(null)}
@@ -108,6 +94,4 @@ function Sidebar({ onFlightSelect, newPolygonPoints, onClearPolygon }) {
       </Modal>
     </div>
   );
-}
-
-export default Sidebar;
+};

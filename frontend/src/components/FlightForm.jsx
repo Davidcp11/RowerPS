@@ -1,9 +1,6 @@
-// src/components/FlightForm.jsx
-
-import React, { useState } from 'react';
+import { useState } from 'react';
 import axios from 'axios'; 
 
-// 1. Defina o estado inicial do formulário aqui
 const initialFormState = {
   mission: '',
   operatorSarpas: '',
@@ -14,15 +11,12 @@ const initialFormState = {
   endTime: '',
 };
 
-function FlightForm({ polygonPoints, onFlightCreated, onClearPolygon }) {
-  // 2. Use um único 'useState' para todos os campos do formulário
+export default function FlightForm({ polygonPoints, onFlightCreated, onClearPolygon }) {
   const [formData, setFormData] = useState(initialFormState);
   
-  // Os estados de controle permanecem separados (o que é bom)
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState(null);
 
-  // 3. Crie um 'handler' genérico para atualizar o estado do formulário
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prevData => ({
@@ -42,11 +36,9 @@ function FlightForm({ polygonPoints, onFlightCreated, onClearPolygon }) {
     setSubmitting(true);
     setFormError(null);
 
-    // 4. Use os valores do objeto 'formData'
     const startISO = `${formData.startDate}T${formData.startTime}:00Z`;
     const endISO = `${formData.endDate}T${formData.endTime}:00Z`;
 
-    // Crie o objeto de envio
     const submissionData = {
       mission: formData.mission,
       operatorSarpas: formData.operatorSarpas,
@@ -59,7 +51,6 @@ function FlightForm({ polygonPoints, onFlightCreated, onClearPolygon }) {
     try {
       const response = await axios.post('http://localhost:3000/flights', submissionData);
       
-      // Limpar o formulário é muito mais fácil agora!
       setFormData(initialFormState); 
       onFlightCreated(response.data); 
 
@@ -78,21 +69,13 @@ function FlightForm({ polygonPoints, onFlightCreated, onClearPolygon }) {
   return (
     <form className="flight-form" onSubmit={handleSubmit}>
       <h3>Cadastrar Novo Voo</h3>
-      
-      {/* --- MUDANÇA NOS INPUTS ---
-        Agora, cada input usa:
-        1. value={formData.nomeDoCampo}
-        2. onChange={handleChange}
-        3. name="nomeDoCampo" (IMPORTANTE!)
-      */}
-      
       <div className="form-group">
         <label>Missão</label>
         <input 
           type="text" 
-          name="mission" // Adicionado
-          value={formData.mission} // Mudou
-          onChange={handleChange} // Mudou
+          name="mission" 
+          value={formData.mission} 
+          onChange={handleChange}
           required 
         />
       </div>
@@ -101,9 +84,9 @@ function FlightForm({ polygonPoints, onFlightCreated, onClearPolygon }) {
         <label>SARPAS do Operador (ex: 123ABC)</label>
         <input 
           type="text" 
-          name="operatorSarpas" // Adicionado
-          value={formData.operatorSarpas} // Mudou
-          onChange={handleChange} // Mudou
+          name="operatorSarpas"
+          value={formData.operatorSarpas}
+          onChange={handleChange}
           required 
           maxLength={6}
         />
@@ -113,9 +96,9 @@ function FlightForm({ polygonPoints, onFlightCreated, onClearPolygon }) {
         <label>SISANT do Drone (ex: PP-1234567)</label>
         <input 
           type="text" 
-          name="droneSisant" // Adicionado
-          value={formData.droneSisant} // Mudou
-          onChange={handleChange} // Mudou
+          name="droneSisant"
+          value={formData.droneSisant}
+          onChange={handleChange}
           required 
         />
       </div>
@@ -125,9 +108,9 @@ function FlightForm({ polygonPoints, onFlightCreated, onClearPolygon }) {
           <label>Data Início</label>
           <input 
             type="date" 
-            name="startDate" // Adicionado
-            value={formData.startDate} // Mudou
-            onChange={handleChange} // Mudou
+            name="startDate"
+            value={formData.startDate}
+            onChange={handleChange}
             required 
           />
         </div>
@@ -135,9 +118,9 @@ function FlightForm({ polygonPoints, onFlightCreated, onClearPolygon }) {
           <label>Hora Início</label>
           <input 
             type="time" 
-            name="startTime" // Adicionado
-            value={formData.startTime} // Mudou
-            onChange={handleChange} // Mudou
+            name="startTime"
+            value={formData.startTime}
+            onChange={handleChange}
             required 
           />
         </div>
@@ -148,9 +131,9 @@ function FlightForm({ polygonPoints, onFlightCreated, onClearPolygon }) {
           <label>Data Fim</label>
           <input 
             type="date" 
-            name="endDate" // Adicionado
-            value={formData.endDate} // Mudou
-            onChange={handleChange} // Mudou
+            name="endDate"
+            value={formData.endDate}
+            onChange={handleChange}
             required 
           />
         </div>
@@ -158,16 +141,13 @@ function FlightForm({ polygonPoints, onFlightCreated, onClearPolygon }) {
           <label>Hora Fim</label>
           <input 
             type="time" 
-            name="endTime" // Adicionado
-            value={formData.endTime} // Mudou
-            onChange={handleChange} // Mudou
+            name="endTime"
+            value={formData.endTime}
+            onChange={handleChange}
             required 
           />
         </div>
       </div>
-
-      {/* --- O restante do formulário (feedback de erro, botões) --- */}
-      {/* Nenhuma mudança necessária aqui */}
 
       {formError && (
         <p className="form-error">{formError}</p>
@@ -200,6 +180,4 @@ function FlightForm({ polygonPoints, onFlightCreated, onClearPolygon }) {
       </button>
     </form>
   );
-}
-
-export default FlightForm;
+};

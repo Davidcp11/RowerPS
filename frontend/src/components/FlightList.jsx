@@ -15,6 +15,7 @@ import {
 
 import SearchIcon from '@mui/icons-material/Search';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
+import ListAltIcon from '@mui/icons-material/ListAlt';
 
 export default function FlightList({
   loading,
@@ -63,6 +64,12 @@ export default function FlightList({
 
   return (
     <Box sx={{ mt: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+        <ListAltIcon color="primary" fontSize="large" />
+        <Typography variant="h5" component="h2" color="primary" sx={{ fontWeight: 'bold' }}>
+          Lista de Voos
+        </Typography>
+      </Box>
       
       <Paper elevation={0} variant="outlined" sx={{ p: 2, backgroundColor: '#f8f9fa' }}>
         <Typography variant="subtitle2" sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2, color: 'text.secondary', fontWeight: 'bold' }}>

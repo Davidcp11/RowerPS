@@ -1,52 +1,72 @@
-// src/components/FlightForm.jsx
-
-import React, { useState } from 'react';
+import { useState } from 'react';
 import axios from 'axios'; 
+import { 
+  TextField, Button, Box, Typography, Grid, Paper, 
+  InputAdornment, Alert, Collapse
+} from '@mui/material';
 
-// 1. Defina o estado inicial do formulário aqui
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { TimePicker } from '@mui/x-date-pickers/TimePicker';
+
+import FlightTakeoffIcon from '@mui/icons-material/FlightTakeoff';
+import PersonIcon from '@mui/icons-material/Person';
+import RadarIcon from '@mui/icons-material/Radar';
+import RefreshIcon from '@mui/icons-material/Refresh';
+import SendIcon from '@mui/icons-material/Send';
+
 const initialFormState = {
   mission: '',
   operatorSarpas: '',
   droneSisant: '',
-  startDate: '',
-  startTime: '',
-  endDate: '',
-  endTime: '',
+  startDate: null,
+  startTime: null,
+  endDate: null,
+  endTime: null,
 };
 
-function FlightForm({ polygonPoints, onFlightCreated, onClearPolygon }) {
-  // 2. Use um único 'useState' para todos os campos do formulário
+export default function FlightForm({ polygonPoints, onFlightCreated, onClearPolygon }) {
   const [formData, setFormData] = useState(initialFormState);
-  
-  // Os estados de controle permanecem separados (o que é bom)
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState(null);
 
-  // 3. Crie um 'handler' genérico para atualizar o estado do formulário
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prevData => ({
-      ...prevData,
-      [name]: value
-    }));
+    setFormData(prevData => ({ ...prevData, [name]: value }));
+    setFormError(null);
+  };
+
+  const handleDateChange = (fieldName, newValue) => {
+    setFormData(prevData => ({ ...prevData, [fieldName]: newValue }));
+    setFormError(null);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    if (polygonPoints.length === 0) {
-      setFormError('Por favor, desenhe o polígono do voo no mapa.');
-      return;
-    }
-
     setSubmitting(true);
     setFormError(null);
 
-    // 4. Use os valores do objeto 'formData'
-    const startISO = `${formData.startDate}T${formData.startTime}:00Z`;
-    const endISO = `${formData.endDate}T${formData.endTime}:00Z`;
+    if (!formData.startDate || !formData.startTime || !formData.endDate || !formData.endTime) {
+      setFormError('Preencha todas as datas e horários.');
+      setSubmitting(false);
+      return;
+    }
 
-    // Crie o objeto de envio
+    if (polygonPoints.length === 0) {
+      setFormError('Por favor, desenhe o polígono do voo no mapa.');
+      setSubmitting(false);
+      return;
+    }
+
+    const dateStartStr = formData.startDate.format('YYYY-MM-DD');
+    const timeStartStr = formData.startTime.format('HH:mm');
+    
+    const dateEndStr = formData.endDate.format('YYYY-MM-DD');
+    const timeEndStr = formData.endTime.format('HH:mm');
+
+    const startISO = `${dateStartStr}T${timeStartStr}:00Z`;
+    const endISO = `${dateEndStr}T${timeEndStr}:00Z`;
+
     const submissionData = {
       mission: formData.mission,
       operatorSarpas: formData.operatorSarpas,
@@ -58,148 +78,172 @@ function FlightForm({ polygonPoints, onFlightCreated, onClearPolygon }) {
 
     try {
       const response = await axios.post('http://localhost:3000/flights', submissionData);
-      
-      // Limpar o formulário é muito mais fácil agora!
       setFormData(initialFormState); 
       onFlightCreated(response.data); 
-
     } catch (err) {
       if (err.response && err.response.data && err.response.data.error) {
         setFormError(err.response.data.error);
       } else {
-        setFormError('Erro ao cadastrar o voo. Tente novamente.');
+        setFormError('Erro ao cadastrar o voo.');
       }
-      console.error('Erro ao enviar formulário:', err);
     } finally {
       setSubmitting(false);
     }
   };
 
   return (
-    <form className="flight-form" onSubmit={handleSubmit}>
-      <h3>Cadastrar Novo Voo</h3>
-      
-      {/* --- MUDANÇA NOS INPUTS ---
-        Agora, cada input usa:
-        1. value={formData.nomeDoCampo}
-        2. onChange={handleChange}
-        3. name="nomeDoCampo" (IMPORTANTE!)
-      */}
-      
-      <div className="form-group">
-        <label>Missão</label>
-        <input 
-          type="text" 
-          name="mission" // Adicionado
-          value={formData.mission} // Mudou
-          onChange={handleChange} // Mudou
-          required 
+    <Paper elevation={3} sx={{ p: 3, mb: 3, borderRadius: 2 }}>
+      <Typography variant="h6" color="primary" gutterBottom sx={{ fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 1 }}>
+        <FlightTakeoffIcon /> Novo Voo
+      </Typography>
+
+      <Box component="form" onSubmit={handleSubmit} noValidate>
+        
+        <TextField
+          margin="normal"
+          required
+          fullWidth
+          id="mission"
+          label="Nome da Missão"
+          name="mission"
+          value={formData.mission}
+          onChange={handleChange}
+          slotProps={{
+            input: {
+              startAdornment: (
+                <InputAdornment position="start">
+                  <RadarIcon color="action" />
+                </InputAdornment>
+              ),
+            },
+          }}
         />
-      </div>
 
-      <div className="form-group">
-        <label>SARPAS do Operador (ex: 123ABC)</label>
-        <input 
-          type="text" 
-          name="operatorSarpas" // Adicionado
-          value={formData.operatorSarpas} // Mudou
-          onChange={handleChange} // Mudou
-          required 
-          maxLength={6}
-        />
-      </div>
+        <Grid container spacing={2} sx={{ mt: 0 }}>
+          <Grid>
+            <TextField
+              required
+              fullWidth
+              label="SARPAS"
+              name="operatorSarpas"
+              placeholder="123ABC"
+              value={formData.operatorSarpas}
+              onChange={handleChange}
+              slotProps={{
+                htmlInput: { maxLength: 6 },
+                input: {
+                  startAdornment: <InputAdornment position="start"><PersonIcon fontSize="small"/></InputAdornment>,
+                },
+              }}
+            />
+          </Grid>
+          <Grid>
+            <TextField
+              required
+              fullWidth
+              label="SISANT"
+              name="droneSisant"
+              placeholder="PP-1234567"
+              value={formData.droneSisant}
+              onChange={handleChange}
+              slotProps={{
+                input: {
+                  startAdornment: <InputAdornment position="start"><FlightTakeoffIcon fontSize="small"/></InputAdornment>,
+                },
+              }}
+            />
+          </Grid>
+        </Grid>
 
-      <div className="form-group">
-        <label>SISANT do Drone (ex: PP-1234567)</label>
-        <input 
-          type="text" 
-          name="droneSisant" // Adicionado
-          value={formData.droneSisant} // Mudou
-          onChange={handleChange} // Mudou
-          required 
-        />
-      </div>
+        <Typography variant="subtitle2" sx={{ mt: 2, mb: 1, color: 'text.secondary' }}>
+          Agendamento
+        </Typography>
+        
+        <Grid container spacing={2}>
+          <Grid>
+            <DatePicker
+              label="Data Início"
+              value={formData.startDate}
+              onChange={(newValue) => handleDateChange('startDate', newValue)}
+              slotProps={{ textField: { fullWidth: true, size: 'small', required: true } }}
+            />
+          </Grid>
+          <Grid>
+            <TimePicker
+              label="Hora Início"
+              value={formData.startTime}
+              onChange={(newValue) => handleDateChange('startTime', newValue)}
+              ampm={false} 
+              slotProps={{ textField: { fullWidth: true, size: 'small', required: true } }}
+            />
+          </Grid>
+          <Grid>
+            <DatePicker
+              label="Data Fim"
+              value={formData.endDate}
+              onChange={(newValue) => handleDateChange('endDate', newValue)}
+              slotProps={{ textField: { fullWidth: true, size: 'small', required: true } }}
+            />
+          </Grid>
+          <Grid>
+            <TimePicker
+              label="Hora Fim"
+              value={formData.endTime}
+              onChange={(newValue) => handleDateChange('endTime', newValue)}
+              ampm={false}
+              slotProps={{ textField: { fullWidth: true, size: 'small', required: true } }}
+            />
+          </Grid>
+        </Grid>
 
-      <div className="form-row">
-        <div className="form-group">
-          <label>Data Início</label>
-          <input 
-            type="date" 
-            name="startDate" // Adicionado
-            value={formData.startDate} // Mudou
-            onChange={handleChange} // Mudou
-            required 
-          />
-        </div>
-        <div className="form-group">
-          <label>Hora Início</label>
-          <input 
-            type="time" 
-            name="startTime" // Adicionado
-            value={formData.startTime} // Mudou
-            onChange={handleChange} // Mudou
-            required 
-          />
-        </div>
-      </div>
+        <Box sx={{ mt: 2 }}>
+          <Collapse in={!!formError}>
+            <Alert severity="error" sx={{ mb: 2 }}>{formError}</Alert>
+          </Collapse>
 
-      <div className="form-row">
-        <div className="form-group">
-          <label>Data Fim</label>
-          <input 
-            type="date" 
-            name="endDate" // Adicionado
-            value={formData.endDate} // Mudou
-            onChange={handleChange} // Mudou
-            required 
-          />
-        </div>
-        <div className="form-group">
-          <label>Hora Fim</label>
-          <input 
-            type="time" 
-            name="endTime" // Adicionado
-            value={formData.endTime} // Mudou
-            onChange={handleChange} // Mudou
-            required 
-          />
-        </div>
-      </div>
+          <Collapse in={polygonPoints.length === 0 && !formError}>
+            <Alert severity="info" variant="outlined">
+              Desenhe a área no mapa ao lado.
+            </Alert>
+          </Collapse>
 
-      {/* --- O restante do formulário (feedback de erro, botões) --- */}
-      {/* Nenhuma mudança necessária aqui */}
+          <Collapse in={polygonPoints.length > 0 && !formError}>
+            <Alert 
+              severity="success"
+              variant="filled"
+              sx={{ 
+                alignItems: 'center',
+                '& .MuiAlert-message': { flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }
+              }}
+            >
+              <span>Área definida!</span>
+              <Button 
+                size="small" 
+                color="inherit" 
+                variant="outlined" 
+                onClick={onClearPolygon}
+                startIcon={<RefreshIcon />}
+                sx={{ borderColor: 'rgba(255,255,255,0.5)', ml: 2 }}
+              >
+                Refazer
+              </Button>
+            </Alert>
+          </Collapse>
+        </Box>
 
-      {formError && (
-        <p className="form-error">{formError}</p>
-      )}
+        <Button
+          type="submit"
+          fullWidth
+          variant="contained"
+          size="large"
+          endIcon={<SendIcon />}
+          disabled={submitting}
+          sx={{ mt: 3, py: 1.5, fontWeight: 'bold', fontSize: '1rem' }}
+        >
+          {submitting ? 'Cadastrando...' : 'Cadastrar Voo'}
+        </Button>
 
-      {polygonPoints.length === 0 && !formError && (
-        <p className="form-info">Use o ícone de polígono no mapa para desenhar a área.</p>
-      )}
-
-      {polygonPoints.length > 0 && (
-        <div className={!!formError ? "form-success-wrapper":"form-error-wrapper"}>
-          {!!formError ? (
-            <p>Área do polígono definida!</p>
-          ) : (
-            <p>Escolha outro polígono!</p>
-          )}
-
-          <button 
-            type="button" 
-            className="cancel-button" 
-            onClick={onClearPolygon}
-          >
-            Refazer
-          </button>
-        </div>
-      )}
-
-      <button type="submit" className="submit-button" disabled={submitting}>
-        {submitting ? 'Cadastrando...' : 'Cadastrar Voo'}
-      </button>
-    </form>
+      </Box>
+    </Paper>
   );
-}
-
-export default FlightForm;
+};

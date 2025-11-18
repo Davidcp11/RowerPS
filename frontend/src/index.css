@@ -7,7 +7,7 @@ body {
   background-color: #f4f4f4;
 }
 
-/* 2. Variáveis de Cor (da paleta do PDF) */
+/* paleta do PDF */
 :root {
   --primary-color: #016c72;
   --secondary-color: #ecb733;
@@ -15,7 +15,7 @@ body {
   --secondary-hover: #d1a121;
 }
 
-/* 3. Layout Principal */
+
 .app-container {
   display: flex;
   flex-direction: column;
@@ -37,23 +37,19 @@ body {
 .app-main {
   display: flex;
   flex-grow: 1;
-  /* Garante que o main ocupe o espaço restante */
   overflow: hidden;
 }
 
-/* 4. Painéis (Lista e Mapa) */
 .list-panel {
   width: 400px;
   padding: 20px;
   background-color: #ffffff;
   overflow-y: auto;
-  /* Adiciona scroll se a lista for longa */
   border-right: 1px solid #ddd;
 }
 
 .map-panel {
   flex-grow: 1;
-  /* Ocupa todo o espaço restante */
   display: flex;
   flex-direction: column;
 }
@@ -64,7 +60,6 @@ body {
   border-bottom: 1px solid #ddd;
 }
 
-/* 5. Estilos do FlightList */
 .flight-list-container {
   padding-top: 20px;
 }
@@ -115,17 +110,12 @@ body {
   background-color: var(--secondary-hover);
 }
 
-/* * Correção para o "piscar" (flicker) do Leaflet no Chrome/Webkit
- * Isso força a aceleração de hardware no painel do mapa
- * de uma forma mais estável durante animações de zoom/pan.
-*/
 .leaflet-container {
   -webkit-backface-visibility: hidden;
   -moz-backface-visibility: hidden;
   backface-visibility: hidden;
 }
 
-/* 6. Estilos do FlightForm */
 .flight-form {
   padding: 20px;
   border-bottom: 2px solid #eee;
@@ -164,7 +154,6 @@ body {
 
 .form-row .form-group {
   flex: 1;
-  /* Ocupa espaço igual */
 }
 
 .submit-button {
@@ -212,65 +201,48 @@ body {
 
 .form-success-wrapper {
   display: flex;
-  /* <-- A MÁGICA: alinha os itens lado a lado */
   align-items: center;
-  /* <-- Alinha verticalmente */
   justify-content: space-around;
-  /* <-- Coloca espaço entre o texto e o botão */
 
   background-color: #DFF2BF;
   font-size: 1rem;
   font-weight: bold;
   border-radius: 5px;
   margin-bottom: 15px;
-  /* Garante que o botão não "vaze" */
   overflow: hidden;
 }
 
 .form-error-wrapper {
   display: flex;
-  /* <-- A MÁGICA: alinha os itens lado a lado */
   align-items: center;
-  /* <-- Alinha verticalmente */
   justify-content: space-around;
-  /* <-- Coloca espaço entre o texto e o botão */
   color: #D8000C;
   background-color: #FFD2D2;
   font-size: 1rem;
   font-weight: bold;
   border-radius: 5px;
   margin-bottom: 15px;
-  /* Garante que o botão não "vaze" */
   overflow: hidden;
 }
 
-/* * A tag <p> com a classe .form-success 
- * (Não precisamos de regras novas aqui, apenas
- * garantir que o seletor .form-success-wrapper p funcione)
-*/
 .form-success-wrapper p {
   color: #4F8A10;
   padding: 5px;
   margin: 0;
   flex-grow: 1;
-  /* Faz o texto ocupar o espaço disponível */
 }
 
-/* O botão "Refazer" */
 .cancel-button {
   background-color: var(--secondary-color);
   color: white;
   border: none;
-  /* Arredonda só os cantos da direita */
   border-radius: 5px;
   padding: 10px 12px;
   cursor: pointer;
   font-weight: bold;
   transition: background-color 0.2s ease;
 
-  /* Garante que o botão não encolha */
   flex-shrink: 0;
-  /* Remove a borda preta do 'focus' */
   outline: none;
 }
 
@@ -279,27 +251,22 @@ body {
 }
 
 .flight-status {
-  /* display: inline-block; é a chave para o badge */
   display: inline-block;
   padding: 5px 12px;
   border-radius: 15px;
-  /* Mais arredondado */
   font-size: 0.8rem;
   font-weight: bold;
   margin-top: 10px;
   text-transform: uppercase;
 }
 
-/* Cor para status 'Agendado' (cor primária) */
 .status-scheduled {
   background-color: #d1eaf0;
   color: var(--primary-color);
 }
 
-/* Cor para status 'Concluído' (neutro) */
 .status-completed {
   background-color: #d1f0dc;
-  /* Um cinza mais claro */
   color: var(--primary-color);
 }
 
@@ -311,35 +278,27 @@ body {
   padding: 10px 20px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 
-  /* Adicione estas duas linhas para alinhar */
   display: flex;
   align-items: center;
 }
 
-/* Adicione este novo estilo */
 .header-logo {
   height: 40px;
-  /* Defina a altura */
   width: 40px;
-  /* Defina a largura */
   margin-right: 15px;
-  /* Dê espaço antes do título */
 }
-/* src/index.css */
-/* ... (outros estilos) ... */
 
-/* Estilos do Modal */
 .modal-overlay {
-  position: fixed; /* Cobre a tela inteira */
+  position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.6); /* Fundo escuro semi-transparente */
+  background-color: rgba(0, 0, 0, 0.6);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000; /* Fica na frente de tudo */
+  z-index: 1000;
 }
 
 .modal-content {
@@ -359,7 +318,6 @@ body {
   text-align: right;
 }
 
-/* Reutilizando o estilo do botão de submit */
 .modal-footer .submit-button {
   width: auto;
   padding: 10px 20px;
